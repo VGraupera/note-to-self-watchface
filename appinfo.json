@@ -1,7 +1,7 @@
 {
   "uuid": "50f2f84c-cd3f-4cd9-ba64-07eabc862511",
-  "shortName": "Priority",
-  "longName": "Priority",
+  "shortName": "Note to Self",
+  "longName": "Note to Self",
   "companyName": "Vidal Graupera",
   "versionCode": 1,
   "versionLabel": "1.0.0",
@@ -9,6 +9,7 @@
     "watchface": true
   },
   "appKeys": {},
+  "capabilities": [ "configurable" ],
   "resources": {
     "media": [
       {

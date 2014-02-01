@@ -2,5 +2,4 @@
 # Ignore build generated files
 build
 .DS_Store
-src/js/pebble-js-app.js
 .lock-waf_darwin_build

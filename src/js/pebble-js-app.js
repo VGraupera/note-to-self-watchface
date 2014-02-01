@@ -1,7 +1,7 @@
 var note = localStorage.getItem('note') || '';
 
 Pebble.addEventListener('showConfiguration', function(e) {
-	var uri = 'configuration.html?' +
+	var uri = 'https://rawgithub.com/VGraupera/note-to-self-watchface/master/html/configuration.html?' +
 				'note=' + encodeURIComponent(note);
 	console.log('showing configuration at uri: ' + uri);
 	Pebble.openURL(uri);

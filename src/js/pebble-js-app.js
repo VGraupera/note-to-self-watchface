@@ -1,7 +1,7 @@
 var note = localStorage.getItem('note') || '';
 
 Pebble.addEventListener('showConfiguration', function(e) {
-	var uri = 'https://rawgithub.com/Neal/pebble-package-trackr/master/html/configuration.html?' +
+	var uri = 'configuration.html?' +
 				'note=' + encodeURIComponent(note);
 	console.log('showing configuration at uri: ' + uri);
 	Pebble.openURL(uri);

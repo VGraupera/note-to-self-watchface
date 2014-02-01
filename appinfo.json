@@ -1,0 +1,15 @@
+{
+  "uuid": "50f2f84c-cd3f-4cd9-ba64-07eabc862511",
+  "shortName": "Priority",
+  "longName": "Priority",
+  "companyName": "Vidal Graupera",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {},
+  "resources": {
+    "media": []
+  }
+}

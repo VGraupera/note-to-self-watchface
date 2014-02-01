@@ -5,14 +5,18 @@
 #define TIME_FRAME      (GRect(0, 18, 144, 168-6))
 #define DATE_FRAME      (GRect(0, 66, 144-4, 168-62))
 
+#define TEXT_FRAME      (GRect(4, 90, 144-8, 78))
+
 // App-specific data
 Window *window;
 TextLayer *time_layer;
 TextLayer *date_layer;
 TextLayer *day_layer;
+TextLayer *text_layer;
 
-GFont font_day_date;
 GFont font_time;
+GFont font_subhead;
+GFont font_text;
 
 // Called once per second
 static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
@@ -48,6 +52,7 @@ static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
     strftime(date_text, sizeof(date_text), "%B %e", tick_time);
     text_layer_set_text(date_layer, date_text);
   }
+
 }
 
 // Handle the start-up of the app
@@ -58,13 +63,14 @@ static void do_init(void) {
   window_stack_push(window, true);
   window_set_background_color(window, GColorBlack);
 
-  font_day_date = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SANS_18));
+  font_subhead = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SANS_18));
   font_time = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SANS_BOLD_48));
+  font_text = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SERIF_18));
 
   day_layer = text_layer_create(DAY_FRAME);
   text_layer_set_text_color(day_layer, GColorWhite);
   text_layer_set_background_color(day_layer, GColorClear);
-  text_layer_set_font(day_layer, font_day_date);
+  text_layer_set_font(day_layer, font_subhead);
   text_layer_set_text_alignment(day_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_layer));
 
@@ -78,9 +84,19 @@ static void do_init(void) {
   date_layer = text_layer_create(DATE_FRAME);
   text_layer_set_text_color(date_layer, GColorWhite);
   text_layer_set_background_color(date_layer, GColorClear);
-  text_layer_set_font(date_layer, font_day_date);
+  text_layer_set_font(date_layer, font_subhead);
   text_layer_set_text_alignment(date_layer, GTextAlignmentRight);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
+
+  text_layer = text_layer_create(TEXT_FRAME);
+  text_layer_set_text_color(text_layer, GColorWhite);
+  text_layer_set_background_color(text_layer, GColorClear);
+  text_layer_set_font(text_layer, font_text);
+  text_layer_set_text_alignment(text_layer, GTextAlignmentLeft);
+  text_layer_set_overflow_mode(text_layer, GTextOverflowModeTrailingEllipsis);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
+
+    text_layer_set_text(text_layer, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, enim eu blandit sagittis, enim magna adipiscing sapien, in pretium odio enim at mi. Aenean et erat tincidunt, pellentesque quam et, porta orci. Maecenas leo orci, vestibulum et tristique at, vulputate nec purus. Cras viverra lacus ornare dapibus bibendum.");
 
     // Update the screen right away
   time_t now = time(NULL);
@@ -99,7 +115,8 @@ static void do_deinit(void) {
   window_destroy(window);
 
   fonts_unload_custom_font(font_time);
-  fonts_unload_custom_font(font_day_date);
+  fonts_unload_custom_font(font_subhead);
+  fonts_unload_custom_font(font_text);
 }
 
 // The main event/run loop for our app

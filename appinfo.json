@@ -13,6 +13,11 @@
     "media": [
       {
         "type": "font",
+        "name": "DROID_SERIF_18",
+        "file": "fonts/Droid_Serif/DroidSerif.ttf"
+      },
+      {
+        "type": "font",
         "name": "DROID_SANS_18",
         "file": "fonts/Droid_Sans/DroidSans.ttf"
       },

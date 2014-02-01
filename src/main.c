@@ -7,6 +7,12 @@
 
 #define TEXT_FRAME      (GRect(4, 90, 144-8, 78))
 
+
+enum {
+  KEY_NOTE = 0,
+  KEY_REQUEST_UPDATE
+};
+
 // App-specific data
 Window *window;
 TextLayer *time_layer;
@@ -17,6 +23,8 @@ TextLayer *text_layer;
 GFont font_time;
 GFont font_subhead;
 GFont font_text;
+
+static void requestUpdate();
 
 // Called once per second
 static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
@@ -35,6 +43,7 @@ static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
     }
 
     strftime(time_text, sizeof(time_text), time_format, tick_time);
+    requestUpdate();
 
     // Kludge to handle lack of non-padded hour format string
     // for twelve hour clock.
@@ -53,6 +62,46 @@ static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
     text_layer_set_text(date_layer, date_text);
   }
 
+}
+
+
+static void in_received_handler(DictionaryIterator *iter, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Received...");
+
+    Tuple *tuple = dict_find(iter, KEY_NOTE);
+  if (!(tuple && tuple->type == TUPLE_CSTRING)) return;
+
+  text_layer_set_text(text_layer, tuple->value->cstring);
+}
+
+static void in_dropped_handler(AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Dropped  %i", reason);
+}
+
+static void out_sent_handler(DictionaryIterator *sent, void *context) {
+  /*APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sent!");*/
+}
+
+static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Failed to Send!  %i", reason);
+}
+
+static void requestUpdate()
+{
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_uint8(iter, KEY_REQUEST_UPDATE, 1);
+  app_message_outbox_send();
+}
+
+static void app_message_init(void) {
+  // Register message handlers
+  app_message_register_inbox_received(in_received_handler);
+  app_message_register_inbox_dropped(in_dropped_handler);
+  app_message_register_outbox_sent(out_sent_handler);
+  app_message_register_outbox_failed(out_failed_handler);
+  // Init buffers
+  app_message_open(512, 64);
 }
 
 // Handle the start-up of the app
@@ -96,7 +145,8 @@ static void do_init(void) {
   text_layer_set_overflow_mode(text_layer, GTextOverflowModeTrailingEllipsis);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
 
-    text_layer_set_text(text_layer, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tincidunt, enim eu blandit sagittis, enim magna adipiscing sapien, in pretium odio enim at mi. Aenean et erat tincidunt, pellentesque quam et, porta orci. Maecenas leo orci, vestibulum et tristique at, vulputate nec purus. Cras viverra lacus ornare dapibus bibendum.");
+  app_message_init();
+  requestUpdate();
 
     // Update the screen right away
   time_t now = time(NULL);

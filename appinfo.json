@@ -8,25 +8,28 @@
   "watchapp": {
     "watchface": true
   },
-  "appKeys": {},
+  "appKeys": {
+    "note": 0,
+    "update": 1
+  },
   "capabilities": [ "configurable" ],
   "resources": {
     "media": [
       {
-        "type": "font",
-        "name": "DROID_SERIF_18",
-        "file": "fonts/Droid_Serif/DroidSerif.ttf"
-      },
-      {
-        "type": "font",
-        "name": "DROID_SANS_18",
-        "file": "fonts/Droid_Sans/DroidSans.ttf"
-      },
-      {
-        "type": "font",
-        "name": "DROID_SANS_BOLD_48",
-        "file": "fonts/Droid_Sans/DroidSans-Bold.ttf"
-      }
+      "type": "font",
+      "name": "DROID_SERIF_18",
+      "file": "fonts/Droid_Serif/DroidSerif.ttf"
+    },
+    {
+      "type": "font",
+      "name": "DROID_SANS_18",
+      "file": "fonts/Droid_Sans/DroidSans.ttf"
+    },
+    {
+      "type": "font",
+      "name": "DROID_SANS_BOLD_48",
+      "file": "fonts/Droid_Sans/DroidSans-Bold.ttf"
+    }
     ]
   }
 }

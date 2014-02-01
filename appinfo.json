@@ -10,6 +10,17 @@
   },
   "appKeys": {},
   "resources": {
-    "media": []
+    "media": [
+      {
+        "type": "font",
+        "name": "DROID_SANS_18",
+        "file": "fonts/Droid_Sans/DroidSans.ttf"
+      },
+      {
+        "type": "font",
+        "name": "DROID_SANS_BOLD_48",
+        "file": "fonts/Droid_Sans/DroidSans-Bold.ttf"
+      }
+    ]
   }
 }

@@ -2,7 +2,7 @@
 #include "pebble.h"
 
 #define DAY_FRAME       (GRect(0, 2, 144, 50))
-#define TIME_FRAME      (GRect(0, 22, 144, 168-6))
+#define TIME_FRAME      (GRect(0, 18, 144, 168-6))
 #define DATE_FRAME      (GRect(0, 66, 144-4, 168-62))
 
 // App-specific data
@@ -11,16 +11,33 @@ TextLayer *time_layer;
 TextLayer *date_layer;
 TextLayer *day_layer;
 
+GFont font_day_date;
+GFont font_time;
+
 // Called once per second
 static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
 
-  static char time_text[] = "00:00 AM"; // Needs to be static because it's used by the system later.
-  static char date_text[] = "February 12 XX";
-  static char day_text[] = "Saturday XX";
+  static char time_text[] = "00:00";
+  static char date_text[] = "Xxxxxxxxxxxxxx XX";
+  static char day_text[] = "Xxxxxxxxxxx";
+
+  char *time_format;
 
   if (units_changed & MINUTE_UNIT) {
-    // Update the time - Deal with 12 / 24 format
-    clock_copy_time_string(time_text, sizeof(time_text));
+    if (clock_is_24h_style()) {
+      time_format = "%R";
+    } else {
+      time_format = "%I:%M";
+    }
+
+    strftime(time_text, sizeof(time_text), time_format, tick_time);
+
+    // Kludge to handle lack of non-padded hour format string
+    // for twelve hour clock.
+    if (!clock_is_24h_style() && (time_text[0] == '0')) {
+      memmove(time_text, &time_text[1], sizeof(time_text) - 1);
+    }
+
     text_layer_set_text(time_layer, time_text);
   }
 
@@ -33,7 +50,6 @@ static void handle_second_tick(struct tm* tick_time, TimeUnits units_changed) {
   }
 }
 
-
 // Handle the start-up of the app
 static void do_init(void) {
 
@@ -42,24 +58,27 @@ static void do_init(void) {
   window_stack_push(window, true);
   window_set_background_color(window, GColorBlack);
 
+  font_day_date = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SANS_18));
+  font_time = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_DROID_SANS_BOLD_48));
+
   day_layer = text_layer_create(DAY_FRAME);
   text_layer_set_text_color(day_layer, GColorWhite);
   text_layer_set_background_color(day_layer, GColorClear);
-  text_layer_set_font(day_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_font(day_layer, font_day_date);
   text_layer_set_text_alignment(day_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_layer));
 
   time_layer = text_layer_create(TIME_FRAME);
   text_layer_set_text_color(time_layer, GColorWhite);
   text_layer_set_background_color(time_layer, GColorClear);
-  text_layer_set_font(time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_font(time_layer, font_time);
   text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
 
   date_layer = text_layer_create(DATE_FRAME);
   text_layer_set_text_color(date_layer, GColorWhite);
   text_layer_set_background_color(date_layer, GColorClear);
-  text_layer_set_font(date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_font(date_layer, font_day_date);
   text_layer_set_text_alignment(date_layer, GTextAlignmentRight);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
 
@@ -78,6 +97,9 @@ static void do_deinit(void) {
   text_layer_destroy(date_layer);
   text_layer_destroy(day_layer);
   window_destroy(window);
+
+  fonts_unload_custom_font(font_time);
+  fonts_unload_custom_font(font_day_date);
 }
 
 // The main event/run loop for our app
